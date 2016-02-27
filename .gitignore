@@ -1,0 +1,5 @@
+# Ignore core dumps
+core
+
+# Ignore Python gunk
+*.pyc
