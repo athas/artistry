@@ -1,4 +1,4 @@
-Mangle farbfeld[1] images
+Mangle [farbfeld][1] images
 =========================
 
 This directory contains a Futhark program that can mangle Farbfeld
