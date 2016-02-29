@@ -5,13 +5,10 @@ import numpy
 import sys
 import melting_frames
 import ctypes
+import time
 
 i = 0
-
-def write_image(d, w, h, i, pixels):
-    f = open('%s/%d.png' % (d, i), 'wb')
-    writer = png.Writer(w, h, greyscale=False, alpha=False, bitdepth=8)
-    writer.write(f, numpy.reshape(pixels, (h, w*3)))
+outdir='out'
 
 def main():
     reader = png.Reader(filename=sys.argv[1])
@@ -20,18 +17,25 @@ def main():
 
     def write_frame(pixels):
         global i
-        write_image('out', w, h, i, pixels)
+        pixels.astype(dtype=numpy.byte, copy=True).tofile('%s/%d.rgb' % (outdir, i))
         i = i + 1
 
     frames_remaining = 1000
     chunksize = 100
     while frames_remaining > 0:
         render = min(frames_remaining, chunksize)
+        time_start = time.time()
         frames = melting_frames.main(render, pixels)
+        time_end = time.time()
+        print('Generated %d frames in %dms' % (render, (time_end-time_start)*1000))
         for frame in frames:
+            time_start = time.time()
             write_frame(frame)
+            time_end = time.time()
+            print('Wrote frame to disk in %dms' % ((time_end-time_start)*1000,))
         frames_remaining = max(0, frames_remaining - chunksize)
         pixels=frames[render-1].astype(dtype=numpy.byte, copy=True)
+    print('width: %d, height: %d' % (w, h))
 
 if __name__ == '__main__':
     main()
